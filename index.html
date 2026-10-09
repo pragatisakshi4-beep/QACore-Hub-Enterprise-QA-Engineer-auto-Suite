@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Core Hub | Enterprise QA Engineering & Automation Suite</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-vial-circle-check"></i>
+                </div>
+                <div class="brand-text">
+                    <h2>QA Core<span>Hub</span></h2>
+                    <span class="version-tag">v2.4 Enterprise</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="nav-section-title">Core Tools</div>
+                <button class="nav-item active" data-tab="dashboard-tab">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard & Metrics</span>
+                </button>
+                <button class="nav-item" data-tab="test-cases-tab">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Test Case Hub</span>
+                    <span class="badge" id="test-count-badge">0</span>
+                </button>
+                <button class="nav-item" data-tab="api-sandbox-tab">
+                    <i class="fa-solid fa-network-wired"></i>
+                    <span>Live API Tester</span>
+                </button>
+                <button class="nav-item" data-tab="defects-tab">
+                    <i class="fa-solid fa-bug"></i>
+                    <span>Bug Tracker</span>
+                    <span class="badge badge-danger" id="open-bugs-badge">0</span>
+                </button>
+
+                <div class="nav-section-title">Automation & Practice</div>
+                <button class="nav-item" data-tab="code-generator-tab">
+                    <i class="fa-solid fa-code"></i>
+                    <span>Code Generator</span>
+                </button>
+                <button class="nav-item" data-tab="playground-tab">
+                    <i class="fa-solid fa-vial"></i>
+                    <span>QA Web Sandbox</span>
+                </button>
+
+                <div class="nav-section-title">Reporting</div>
+                <button class="nav-item" data-tab="reports-tab">
+                    <i class="fa-solid fa-file-contract"></i>
+                    <span>Executive Test Report</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="qa-profile">
+                    <div class="avatar">QA</div>
+                    <div class="profile-info">
+                        <span class="profile-name">Senior QA Lead</span>
+                        <span class="profile-role">Automation & Quality</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="navbar-left">
+                    <button id="toggle-sidebar" class="icon-btn" title="Toggle Sidebar">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div class="env-selector-wrapper">
+                        <i class="fa-solid fa-server"></i>
+                        <label for="env-selector" class="sr-only">Target Environment</label>
+                        <select id="env-selector" class="env-select">
+                            <option value="staging">Environment: Staging (v2.4.0-rc1)</option>
+                            <option value="dev">Environment: Development (Edge)</option>
+                            <option value="prod">Environment: Production (v2.3.8)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="navbar-right">
+                    <button class="btn btn-outline btn-sm" id="btn-run-all-tests">
+                        <i class="fa-solid fa-play text-success"></i> Run Full Suite
+                    </button>
+                    <button class="btn btn-primary btn-sm" id="btn-new-test">
+                        <i class="fa-solid fa-plus"></i> New Test Case
+                    </button>
+                    <div class="divider-v"></div>
+                    <button class="icon-btn" id="theme-toggle" title="Toggle Light/Dark Theme">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Notification Toast Container -->
+            <div id="toast-container" class="toast-container"></div>
+
+            <!-- Content Area Views -->
+            <div class="content-body">
+                
+                <!-- VIEW 1: DASHBOARD & METRICS -->
+                <section id="dashboard-tab" class="tab-page active">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">QA Quality Dashboard</h1>
+                            <p class="page-subtitle">Real-time automation health, execution metrics, and defect KPIs.</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-secondary btn-sm" id="btn-export-data">
+                                <i class="fa-solid fa-download"></i> Export QA State
+                            </button>
+                            <button class="btn btn-outline btn-sm" id="btn-reset-data">
+                                <i class="fa-solid fa-rotate-left"></i> Reset Defaults
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Metrics Stat Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon icon-blue">
+                                <i class="fa-solid fa-list-check"></i>
+                            </div>
+                            <div class="stat-details">
+                                <span class="stat-label">Total Test Cases</span>
+                                <h3 class="stat-value" id="stat-total-tests">0</h3>
+                                <span class="stat-sub text-muted">Across 5 Modules</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon icon-green">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                            <div class="stat-details">
+                                <span class="stat-label">Pass Rate</span>
+                                <h3 class="stat-value" id="stat-pass-rate">0%</h3>
+                                <span class="stat-sub text-success" id="stat-passed-count">0 Passed</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon icon-red">
+                                <i class="fa-solid fa-circle-xmark"></i>
+                            </div>
+                            <div class="stat-details">
+                                <span class="stat-label">Active Defects</span>
+                                <h3 class="stat-value" id="stat-bugs-count">0</h3>
+                                <span class="stat-sub text-danger" id="stat-critical-bugs">0 Critical</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon icon-purple">
+                                <i class="fa-solid fa-bolt"></i>
+                            </div>
+                            <div class="stat-details">
+                                <span class="stat-label">Automation Coverage</span>
+                                <h3 class="stat-value" id="stat-automation-coverage">85%</h3>
+                                <span class="stat-sub text-purple">Cypress & Playwright</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="charts-grid">
+                        <div class="card chart-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-chart-pie"></i> Test Execution Status</h3>
+                                <span class="card-tag">Latest Run</span>
+                            </div>
+                            <div class="card-body chart-wrapper">
+                                <canvas id="statusChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="card chart-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-chart-bar"></i> Test Coverage by Type</h3>
+                                <span class="card-tag">Functional & API</span>
+                            </div>
+                            <div class="card-body chart-wrapper">
+                                <canvas id="typeChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="card chart-card full-width">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-chart-line"></i> Execution Velocity & Flakiness Trend</h3>
+                                <span class="card-tag">Last 7 Runs</span>
+                            </div>
+                            <div class="card-body chart-wrapper">
+                                <canvas id="trendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 2: TEST CASE HUB -->
+                <section id="test-cases-tab" class="tab-page">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Test Case Execution Suite</h1>
+                            <p class="page-subtitle">Manage, execute, and track automated & manual test cases.</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-success btn-sm" id="btn-run-filtered">
+                                <i class="fa-solid fa-play"></i> Run Filtered
+                            </button>
+                            <button class="btn btn-primary btn-sm" id="btn-add-test-modal">
+                                <i class="fa-solid fa-plus"></i> Create Test Case
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filter Bar -->
+                    <div class="card filter-card">
+                        <div class="filter-row">
+                            <div class="search-box">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="test-search-input" placeholder="Search test title, ID, or tag...">
+                            </div>
+                            <div class="filter-group">
+                                <label for="filter-status">Status:</label>
+                                <select id="filter-status">
+                                    <option value="ALL">All Statuses</option>
+                                    <option value="PASSED">Passed</option>
+                                    <option value="FAILED">Failed</option>
+                                    <option value="BLOCKED">Blocked</option>
+                                    <option value="UNTESTED">Untested</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="filter-priority">Priority:</label>
+                                <select id="filter-priority">
+                                    <option value="ALL">All Priorities</option>
+                                    <option value="P0 - Blocker">P0 - Blocker</option>
+                                    <option value="P1 - High">P1 - High</option>
+                                    <option value="P2 - Medium">P2 - Medium</option>
+                                    <option value="P3 - Low">P3 - Low</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="filter-type">Type:</label>
+                                <select id="filter-type">
+                                    <option value="ALL">All Types</option>
+                                    <option value="UI / Functional">UI / Functional</option>
+                                    <option value="REST API">REST API</option>
+                                    <option value="Security">Security</option>
+                                    <option value="Performance">Performance</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Test Table Card -->
+                    <div class="card table-card">
+                        <div class="table-responsive">
+                            <table class="qa-table" id="test-cases-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;"><input type="checkbox" id="select-all-tests" title="Select All"></th>
+                                        <th>ID</th>
+                                        <th>Test Case Title</th>
+                                        <th>Module</th>
+                                        <th>Type</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                        <th>Duration</th>
+                                        <th style="width: 140px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="test-cases-tbody">
+                                    <!-- Dynamic Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 3: LIVE API TESTER -->
+                <section id="api-sandbox-tab" class="tab-page">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Live API Testing Sandbox</h1>
+                            <p class="page-subtitle">Postman-style REST API request builder & instant assertion runner.</p>
+                        </div>
+                    </div>
+
+                    <div class="api-grid">
+                        <!-- Request Config Panel -->
+                        <div class="card api-request-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-paper-plane"></i> HTTP Request Config</h3>
+                                <div class="preset-dropdown">
+                                    <label for="api-preset-select" class="sr-only">Load Preset API</label>
+                                    <select id="api-preset-select" class="btn-sm">
+                                        <option value="">-- Quick API Presets --</option>
+                                        <option value="get-users">GET /users (JSONPlaceholder)</option>
+                                        <option value="post-auth">POST /login (ReqRes Mock)</option>
+                                        <option value="get-products">GET /products (DummyJSON)</option>
+                                        <option value="post-order">POST /order (E-commerce Order)</option>
+                                        <option value="invalid-404">GET /notfound (404 Error Test)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <div class="url-bar">
+                                    <label for="api-method" class="sr-only">HTTP Method</label>
+                                    <select id="api-method" class="method-select">
+                                        <option value="GET">GET</option>
+                                        <option value="POST">POST</option>
+                                        <option value="PUT">PUT</option>
+                                        <option value="DELETE">DELETE</option>
+                                        <option value="PATCH">PATCH</option>
+                                    </select>
+                                    <input type="text" id="api-url" class="url-input" placeholder="https://jsonplaceholder.typicode.com/posts/1">
+                                    <button class="btn btn-primary" id="btn-send-api">
+                                        <i class="fa-solid fa-play"></i> Send
+                                    </button>
+                                </div>
+
+                                <!-- Request Tabs -->
+                                <div class="tab-group mt-3">
+                                    <div class="tab-headers">
+                                        <button class="subtab-btn active" data-subtab="subtab-headers">Headers</button>
+                                        <button class="subtab-btn" data-subtab="subtab-body">Body (JSON)</button>
+                                        <button class="subtab-btn" data-subtab="subtab-assertions">QA Assertions</button>
+                                    </div>
+                                    <div class="subtab-content active" id="subtab-headers">
+                                        <textarea id="api-headers" class="code-editor" rows="4" placeholder='{"Content-Type": "application/json", "Authorization": "Bearer token_qa_123"}'></textarea>
+                                    </div>
+                                    <div class="subtab-content" id="subtab-body">
+                                        <textarea id="api-body" class="code-editor" rows="6" placeholder='{\n  "title": "Automation Test",\n  "body": "Testing REST API endpoints with QA Hub",\n  "userId": 1\n}'></textarea>
+                                    </div>
+                                    <div class="subtab-content" id="subtab-assertions">
+                                        <div class="assertions-builder">
+                                            <div class="assertion-row">
+                                                <label><input type="checkbox" id="assert-status-check" checked> Expected Status Code:</label>
+                                                <input type="number" id="assert-status-val" value="200" style="width: 80px;">
+                                            </div>
+                                            <div class="assertion-row">
+                                                <label><input type="checkbox" id="assert-time-check" checked> Max Response Time (ms):</label>
+                                                <input type="number" id="assert-time-val" value="1000" style="width: 100px;">
+                                            </div>
+                                            <div class="assertion-row">
+                                                <label><input type="checkbox" id="assert-key-check" checked> JSON Property Exists:</label>
+                                                <input type="text" id="assert-key-val" value="id" placeholder="e.g. id or status">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Response Panel -->
+                        <div class="card api-response-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-code-compare"></i> Response Output</h3>
+                                <div class="api-metrics-badge" id="api-metrics-badge">
+                                    <span class="badge badge-neutral" id="res-status-code">Status: ---</span>
+                                    <span class="badge badge-neutral" id="res-time">Time: 0 ms</span>
+                                    <span class="badge badge-neutral" id="res-size">Size: 0 B</span>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <!-- Assertion Results Panel -->
+                                <div class="assertion-results-box" id="assertion-results-box">
+                                    <div class="text-muted"><i class="fa-solid fa-info-circle"></i> Send a request to see response and QA assertions.</div>
+                                </div>
+
+                                <div class="response-viewer mt-3">
+                                    <pre><code id="api-response-body" class="json-code">// Response JSON payload will appear here...</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 4: BUG & DEFECT TRACKER -->
+                <section id="defects-tab" class="tab-page">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Bug & Defect Tracking Board</h1>
+                            <p class="page-subtitle">Jira-style defect lifecycle management for QA & Engineering alignment.</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-primary btn-sm" id="btn-new-defect">
+                                <i class="fa-solid fa-bug"></i> Report Defect
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Kanban Board -->
+                    <div class="kanban-board">
+                        <!-- Column 1: Open / New -->
+                        <div class="kanban-column" data-status="OPEN">
+                            <div class="kanban-header header-open">
+                                <h4><i class="fa-solid fa-folder-open"></i> Open Bugs</h4>
+                                <span class="badge" id="count-kanban-open">0</span>
+                            </div>
+                            <div class="kanban-cards" id="kanban-open-container"></div>
+                        </div>
+
+                        <!-- Column 2: In Progress -->
+                        <div class="kanban-column" data-status="IN_PROGRESS">
+                            <div class="kanban-header header-progress">
+                                <h4><i class="fa-solid fa-spinner"></i> In Progress</h4>
+                                <span class="badge" id="count-kanban-progress">0</span>
+                            </div>
+                            <div class="kanban-cards" id="kanban-progress-container"></div>
+                        </div>
+
+                        <!-- Column 3: Ready for QA Re-test -->
+                        <div class="kanban-column" data-status="RETEST">
+                            <div class="kanban-header header-retest">
+                                <h4><i class="fa-solid fa-vial"></i> Ready for Retest</h4>
+                                <span class="badge" id="count-kanban-retest">0</span>
+                            </div>
+                            <div class="kanban-cards" id="kanban-retest-container"></div>
+                        </div>
+
+                        <!-- Column 4: Resolved / Closed -->
+                        <div class="kanban-column" data-status="CLOSED">
+                            <div class="kanban-header header-closed">
+                                <h4><i class="fa-solid fa-circle-check"></i> Closed / Verified</h4>
+                                <span class="badge" id="count-kanban-closed">0</span>
+                            </div>
+                            <div class="kanban-cards" id="kanban-closed-container"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 5: AUTOMATION CODE GENERATOR -->
+                <section id="code-generator-tab" class="tab-page">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Automated Code Script Generator</h1>
+                            <p class="page-subtitle">Instantly generate Cypress, Playwright, Selenium, & Pytest scripts from test cases.</p>
+                        </div>
+                    </div>
+
+                    <div class="generator-container">
+                        <div class="card generator-config-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-sliders"></i> Test Script Parameters</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="gen-framework">Target Automation Framework:</label>
+                                    <select id="gen-framework" class="form-control">
+                                        <option value="cypress">Cypress (JavaScript / E2E)</option>
+                                        <option value="playwright-ts">Playwright (TypeScript / POM)</option>
+                                        <option value="playwright-py">Playwright (Python / Pytest)</option>
+                                        <option value="selenium-py">Selenium (Python / WebDriver)</option>
+                                        <option value="restassured-java">REST Assured (Java / API)</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group mt-3">
+                                    <label for="gen-test-select">Select Test Case Template:</label>
+                                    <select id="gen-test-select" class="form-control"></select>
+                                </div>
+
+                                <div class="form-group mt-3">
+                                    <label for="gen-target-url">Target URL / Base Endpoint:</label>
+                                    <input type="text" id="gen-target-url" class="form-control" value="https://app.example.com/login">
+                                </div>
+
+                                <button class="btn btn-primary w-100 mt-4" id="btn-generate-code">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Automation Script
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card generator-code-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-terminal"></i> Generated Script Output</h3>
+                                <button class="btn btn-outline btn-sm" id="btn-copy-code">
+                                    <i class="fa-solid fa-copy"></i> Copy Script
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <pre><code id="generated-code-block" class="code-editor" style="min-height: 380px;">// Select framework and click Generate to produce runnable automation code...</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 6: QA WEB SANDBOX PLAYGROUND -->
+                <section id="playground-tab" class="tab-page">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">QA Automation & Manual Sandbox</h1>
+                            <p class="page-subtitle">Interactive playground designed for testing form validations, async loaders, shadow elements & dynamic DOM.</p>
+                        </div>
+                    </div>
+
+                    <div class="playground-grid">
+                        <!-- Dynamic Form Sandbox -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-id-card"></i> Complex Form Validation Suite</h3>
+                                <span class="card-tag">Edge Cases</span>
+                            </div>
+                            <div class="card-body">
+                                <form id="sandbox-form" onsubmit="event.preventDefault();">
+                                    <div class="form-group">
+                                        <label for="sb-email">Email (Regex & Domain Check):</label>
+                                        <input type="email" id="sb-email" class="form-control" placeholder="user@company.com">
+                                        <span class="error-feedback" id="err-sb-email"></span>
+                                    </div>
+
+                                    <div class="form-group mt-2">
+                                        <label for="sb-password">Password Strength Validator:</label>
+                                        <input type="password" id="sb-password" class="form-control" placeholder="Min 8 chars, 1 uppercase, 1 symbol">
+                                        <div class="password-meter mt-1">
+                                            <div class="meter-bar" id="pwd-meter-bar"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mt-2">
+                                        <label for="sb-role">Role Selection (Dynamic Cascading):</label>
+                                        <select id="sb-role" class="form-control">
+                                            <option value="">Select Role</option>
+                                            <option value="admin">Administrator</option>
+                                            <option value="tester">QA Automation Lead</option>
+                                            <option value="dev">Software Developer</option>
+                                        </select>
+                                    </div>
+
+                                    <button class="btn btn-success mt-3" id="sb-submit-btn">Validate & Submit</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Wait & Async Element Sandbox -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-hourglass-half"></i> Explicit Wait & Dynamic Loader Sandbox</h3>
+                                <span class="card-tag">Timing Test</span>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">Simulate async latency, dynamic AJAX delays, and element visibility toggles for Selenium/Cypress wait strategies.</p>
+
+                                <div class="async-controls mt-3">
+                                    <button class="btn btn-outline btn-sm" id="btn-trigger-delay">Trigger 3s Delayed Element</button>
+                                    <button class="btn btn-outline btn-sm" id="btn-trigger-stale">Simulate Stale Element</button>
+                                </div>
+
+                                <div id="async-output-box" class="async-output mt-4">
+                                    <span class="text-muted">Status: Idle</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 7: EXECUTIVE TEST REPORT -->
+                <section id="reports-tab" class="tab-page">
+                    <div class="page-header">
+                        <div>
+                            <h1 class="page-title">Executive QA Test Summary Report</h1>
+                            <p class="page-subtitle">Formal audit report for engineering managers, product owners & stakeholders.</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-primary btn-sm" id="btn-print-report">
+                                <i class="fa-solid fa-print"></i> Print / Save PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="report-paper card" id="printable-report">
+                        <div class="report-header">
+                            <div>
+                                <h2 class="report-title">STAGING ENVIRONMENT QUALITY AUDIT</h2>
+                                <p class="report-meta">Release Candidate: <strong>v2.4.0-rc1</strong> | Date: <span id="report-date">Oct 2026</span></p>
+                            </div>
+                            <div class="report-badge-pass" id="report-status-stamp">STATUS: APPROVED FOR DEPLOYMENT</div>
+                        </div>
+
+                        <hr class="report-divider">
+
+                        <div class="report-section">
+                            <h3>1. Executive Summary</h3>
+                            <p id="report-summary-text">The Quality Assurance suite executed 24 automated and manual test cases across Authentication, REST APIs, Payment Processing, and Core UI workflows. The overall test pass rate achieved is 91.6% with zero critical P0 blockers currently active.</p>
+                        </div>
+
+                        <div class="report-metrics-grid">
+                            <div class="rep-metric">
+                                <span class="rep-label">Executed Tests</span>
+                                <span class="rep-val" id="rep-total">24</span>
+                            </div>
+                            <div class="rep-metric">
+                                <span class="rep-label">Passed</span>
+                                <span class="rep-val text-success" id="rep-passed">22</span>
+                            </div>
+                            <div class="rep-metric">
+                                <span class="rep-label">Failed</span>
+                                <span class="rep-val text-danger" id="rep-failed">2</span>
+                            </div>
+                            <div class="rep-metric">
+                                <span class="rep-label">Pass Rate</span>
+                                <span class="rep-val text-primary" id="rep-rate">91.6%</span>
+                            </div>
+                        </div>
+
+                        <div class="report-section mt-4">
+                            <h3>2. Test Case Breakdown</h3>
+                            <table class="report-table">
+                                <thead>
+                                    <tr>
+                                        <th>Module</th>
+                                        <th>Total Cases</th>
+                                        <th>Passed</th>
+                                        <th>Failed</th>
+                                        <th>Pass %</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="report-breakdown-tbody">
+                                    <!-- Dynamic breakdown -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="report-section mt-4">
+                            <h3>3. Open Defect Summary</h3>
+                            <div id="report-defects-summary">
+                                <!-- Dynamic defect list -->
+                            </div>
+                        </div>
+
+                        <div class="report-signatures mt-5">
+                            <div class="sig-block">
+                                <div class="sig-line"></div>
+                                <p>Lead QA Automation Engineer</p>
+                            </div>
+                            <div class="sig-block">
+                                <div class="sig-line"></div>
+                                <p>Head of Software Engineering</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: ADD / EDIT TEST CASE -->
+    <div class="modal" id="modal-test-case">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-test-title">Create New Test Case</h3>
+                    <button class="close-btn" id="close-modal-test">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-test-case">
+                        <input type="hidden" id="tc-id-hidden">
+                        
+                        <div class="form-group">
+                            <label for="tc-title">Test Title *</label>
+                            <input type="text" id="tc-title" class="form-control" placeholder="e.g. Verify User Login with Valid Credentials" required>
+                        </div>
+
+                        <div class="form-row mt-2">
+                            <div class="form-group col">
+                                <label for="tc-module">Module *</label>
+                                <select id="tc-module" class="form-control">
+                                    <option value="Authentication">Authentication</option>
+                                    <option value="Checkout & Cart">Checkout & Cart</option>
+                                    <option value="REST API">REST API</option>
+                                    <option value="User Profile">User Profile</option>
+                                    <option value="Payment Gateway">Payment Gateway</option>
+                                </select>
+                            </div>
+                            <div class="form-group col">
+                                <label for="tc-type">Test Type *</label>
+                                <select id="tc-type" class="form-control">
+                                    <option value="UI / Functional">UI / Functional</option>
+                                    <option value="REST API">REST API</option>
+                                    <option value="Security">Security</option>
+                                    <option value="Performance">Performance</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row mt-2">
+                            <div class="form-group col">
+                                <label for="tc-priority">Priority *</label>
+                                <select id="tc-priority" class="form-control">
+                                    <option value="P0 - Blocker">P0 - Blocker</option>
+                                    <option value="P1 - High" selected>P1 - High</option>
+                                    <option value="P2 - Medium">P2 - Medium</option>
+                                    <option value="P3 - Low">P3 - Low</option>
+                                </select>
+                            </div>
+                            <div class="form-group col">
+                                <label for="tc-status">Status *</label>
+                                <select id="tc-status" class="form-control">
+                                    <option value="UNTESTED">UNTESTED</option>
+                                    <option value="PASSED">PASSED</option>
+                                    <option value="FAILED">FAILED</option>
+                                    <option value="BLOCKED">BLOCKED</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-2">
+                            <label for="tc-steps">Test Steps (One step per line)</label>
+                            <textarea id="tc-steps" class="form-control" rows="3" placeholder="1. Navigate to /login&#10;2. Enter valid email and password&#10;3. Click Submit button"></textarea>
+                        </div>
+
+                        <div class="form-group mt-2">
+                            <label for="tc-expected">Expected Result</label>
+                            <input type="text" id="tc-expected" class="form-control" placeholder="User redirects to dashboard with status 200">
+                        </div>
+
+                        <div class="modal-footer mt-4">
+                            <button type="button" class="btn btn-outline" id="btn-cancel-tc">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Test Case</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: REPORT DEFECT -->
+    <div class="modal" id="modal-defect">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Report Defect / Bug</h3>
+                    <button class="close-btn" id="close-modal-defect">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-defect">
+                        <div class="form-group">
+                            <label for="bug-title">Bug Title *</label>
+                            <input type="text" id="bug-title" class="form-control" placeholder="e.g. 500 Internal Error on Checkout Payment submission" required>
+                        </div>
+
+                        <div class="form-row mt-2">
+                            <div class="form-group col">
+                                <label for="bug-severity">Severity *</label>
+                                <select id="bug-severity" class="form-control">
+                                    <option value="Critical">Critical</option>
+                                    <option value="Major" selected>Major</option>
+                                    <option value="Minor">Minor</option>
+                                    <option value="Trivial">Trivial</option>
+                                </select>
+                            </div>
+                            <div class="form-group col">
+                                <label for="bug-status">Status *</label>
+                                <select id="bug-status" class="form-control">
+                                    <option value="OPEN">OPEN</option>
+                                    <option value="IN_PROGRESS">IN_PROGRESS</option>
+                                    <option value="RETEST">RETEST</option>
+                                    <option value="CLOSED">CLOSED</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-2">
+                            <label for="bug-steps">Steps to Reproduce</label>
+                            <textarea id="bug-steps" class="form-control" rows="3" placeholder="1. Add product to cart&#10;2. Proceed to checkout&#10;3. Click pay now"></textarea>
+                        </div>
+
+                        <div class="form-group mt-2">
+                            <label for="bug-actual">Actual vs Expected Behavior</label>
+                            <input type="text" id="bug-actual" class="form-control" placeholder="Actual: Blank screen. Expected: Order confirmation page.">
+                        </div>
+
+                        <div class="modal-footer mt-4">
+                            <button type="button" class="btn btn-outline" id="btn-cancel-bug">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Log Defect</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+</body>
+</html>

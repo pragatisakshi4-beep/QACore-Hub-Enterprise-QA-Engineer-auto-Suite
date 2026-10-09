@@ -1,0 +1,45 @@
+{
+	"info": {
+		"_postman_id": "c928471b-7a32-4211-9a2e-839218d79901",
+		"name": "QA Enterprise API Test Suite",
+		"description": "Postman API Collection with pre-request scripts & test assertions.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET Users List",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/users",
+					"host": ["{{base_url}}"],
+					"path": ["users"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Create Post",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"QA API Test\",\n  \"body\": \"Postman collection execution\",\n  \"userId\": 1\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/posts",
+					"host": ["{{base_url}}"],
+					"path": ["posts"]
+				}
+			},
+			"response": []
+		}
+	]
+}
